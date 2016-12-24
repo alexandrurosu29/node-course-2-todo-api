@@ -30,6 +30,7 @@ beforeEach((done) => {
 describe('POST /todos', () => {
 	it('should create a new todo', (done) => {
 		let text = 'Test todo text';
+		
 		request(app)
 			.post('/todos')
 			.send({
@@ -97,7 +98,7 @@ describe('GET /todos/:id', () => {
 			.expect(200)
 			// custom expect
 			.expect((res) => {
-				expect(res.body.text).toBe(todos[0].text);
+				expect(res.body.todo.text).toBe(todos[0].text);
 			})
 			.end(done);
 	})

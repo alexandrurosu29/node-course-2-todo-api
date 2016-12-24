@@ -10,6 +10,7 @@ const {ObjectID} = require('mongodb');
 let {mongoose} = require('./db/mongoose.js');
 let {Todo} = require('./models/todo');
 let {User} = require('./models/user');
+let {authenticate} = require('./middleware/authenticate');
 
 let app = express();
 const port = process.env.PORT;
@@ -50,7 +51,7 @@ app.get('/todos/:id', (req, res) => {
 			return res.status(404).send();
 		}
 
-		res.send(todo);
+		res.send({todo});
 
 	}).catch((e) => {
 		res.status(400).send();
@@ -101,6 +102,29 @@ app.patch('/todos/:id', (req, res) => {
 	}).catch((e) => {
 		res.status(400).send();
 	});
+});
+
+app.post('/users', (req, res) => {
+	let body = _.pick(req.body, ['email', 'password']);
+
+	let user = new User({
+		email: body.email,
+		password: body.password,
+	});
+
+
+	user.save().then(() => {
+		return user.generateAuthToken();
+	}).then((token) => {
+		res.header('x-auth',token).send(user);
+	}).catch((e) => {
+		res.status(400).send(e);
+	});
+});
+
+// make private route
+app.get('/users/me', authenticate, (req, res) => {
+	res.send(req.user);
 });
 
 app.listen(port, () => {
