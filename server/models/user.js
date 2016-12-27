@@ -74,6 +74,20 @@ UserSchema.pre('save', function(next) {
 	}
 });
 
+UserSchema.methods.removeToken = function(token) {
+  let user = this;
+
+  return user.update({
+    // removes data from an array if it matches
+    $pull: {
+      tokens: {
+        token: token
+      }
+    }
+  })
+};
+
+
 // model method
 UserSchema.statics.findByToken = function(token) {
 	// model as the 'this' obj
